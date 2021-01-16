@@ -1,0 +1,3 @@
+QUEUE_NAME = "watcher_queue"
+WATCH_INTERVAL_SECONDS = 3
+HEARTBEAT = 5
