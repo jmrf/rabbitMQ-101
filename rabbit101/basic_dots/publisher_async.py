@@ -59,7 +59,7 @@ class Publisher:
         if self._stopping:
             self._connection.ioloop.stop()
         else:
-            logger.warning("Connection closed, reopening in 5 seconds: {reason}")
+            logger.warning(f"Connection closed, reopening in 5 seconds: {reason}")
             # self._connection.ioloop.call_later(5, self._connection.ioloop.stop)
 
     def on_channel_open(self, channel):
