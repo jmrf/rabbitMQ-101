@@ -1,13 +1,13 @@
-import coloredlogs
 import logging
-import pika
-import sys
 import os
+import sys
 import time
-import json
 
-from constants import QUEUE_NAME
-from constants import HEARBEAT
+import coloredlogs
+import pika
+
+from .constants import HEARTBEAT
+from .constants import QUEUE_NAME
 
 
 logger = logging.getLogger(__name__)
@@ -23,7 +23,7 @@ def callback(ch, method, properties, body):
 
     do_some_work(body.count(b"."))
 
-    logger.info(" [x] Done")
+    logger.info("🍻 Done")
     ch.basic_ack(delivery_tag=method.delivery_tag)
 
 
@@ -37,7 +37,7 @@ def main():
     channel.basic_qos(prefetch_count=1)
     channel.basic_consume(queue=QUEUE_NAME, on_message_callback=callback)
 
-    print(" [*] Waiting for messages. To exit press CTRL+C")
+    print("⌛ Waiting for messages. To exit press CTRL+C")
     channel.start_consuming()
 
 

@@ -1,11 +1,9 @@
-import coloredlogs
 import logging
-import pika
-import random
-import time
 
-from constants import QUEUE_NAME
-from constants import HEARTBEAT
+import coloredlogs
+import pika
+
+from .constants import QUEUE_NAME
 
 
 logger = logging.getLogger(__name__)
@@ -20,8 +18,10 @@ class Watcher:
 
     def init_queue(self):
         self.connection = pika.BlockingConnection(
+            # for connection no to die while blocked waiting for inputs
+            # we must set the heartbeat to 0 (although is discouraged)
             pika.ConnectionParameters(
-                "localhost", blocked_connection_timeout=5, heartbeat=HEARTBEAT
+                "localhost", blocked_connection_timeout=5, heartbeat=0
             )
         )
 
@@ -45,23 +45,15 @@ class Watcher:
 
     def run(self):
         while True:
-            logger.info(f"Waiting for tasks....")
+            logger.info(f"Waiting for a 📨 to send")
 
-            now = time.time()
-            if now - self.last_send > HEARTBEAT * 4:
-                dots = "." * random.randint(3, 8)
+            dots = input(f"Write some dots\t\t")
 
-                # send tuple data
-                self.send_message(dots)
-
-                self.last_send = time.time()
-
-            time.sleep(0.2)
+            # send tuple data
+            self.send_message(dots)
 
 
 if __name__ == "__main__":
-
-    # message = " ".join(sys.argv[1:]) or "Hello World!"
 
     log_level = logging.DEBUG
     coloredlogs.install(logger=logger, level=log_level)

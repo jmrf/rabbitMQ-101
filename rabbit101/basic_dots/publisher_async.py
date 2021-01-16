@@ -1,11 +1,11 @@
-import coloredlogs
 import logging
+import time
+
+import coloredlogs
 import pika
 
-
-from constants import QUEUE_NAME
-from constants import WATCH_INTERVAL_SECONDS
-
+from ..utils import fire_and_forget
+from .constants import QUEUE_NAME
 
 
 logger = logging.getLogger(__name__)
@@ -13,10 +13,7 @@ logger = logging.getLogger(__name__)
 
 class Publisher:
     def __init__(
-        self,
-        queue_name: str,
-        ampq_uri: str = "localhost",
-        heartbeat: int = 60,
+        self, queue_name: str, ampq_uri: str = "localhost", heartbeat: int = 60,
     ):
         # RabbitMQ parameters
         self._uri = ampq_uri
@@ -38,7 +35,7 @@ class Publisher:
             parameters=params,
             on_open_callback=self.on_connection_open,
             on_open_error_callback=self.on_connection_open_error,
-            on_close_callback=self.on_connection_closed
+            on_close_callback=self.on_connection_closed,
         )
 
     def on_connection_open(self, _unused_connection):
@@ -53,11 +50,11 @@ class Publisher:
 
     def on_connection_closed(self, _unused_connection, reason):
         """Invoked by pika when the connection to RabbitMQ is closed unexpectedly"""
-        self._channel=None
+        self._channel = None
         if self._stopping:
             self._connection.ioloop.stop()
         else:
-            logger.warning('Connection closed, reopening in 5 seconds: {reason}')
+            logger.warning("Connection closed, reopening in 5 seconds: {reason}")
             # self._connection.ioloop.call_later(5, self._connection.ioloop.stop)
 
     def on_channel_open(self, channel):
@@ -82,13 +79,13 @@ class Publisher:
 
         self._channel.basic_publish(
             exchange="",
-            routing_key=self.queue_name,
+            routing_key=self._queue_name,
             body=message,
             properties=pika.BasicProperties(
                 delivery_mode=2,
             ),  # make message persistent
         )
-        logger.info(" [x] Sent %r" % message)
+        logger.info("🍻 Sent %r" % message)
 
         # Do we need to close the connection!?
         # self.connection.close()
@@ -112,6 +109,7 @@ class Publisher:
             logger.info("Closing connection")
             self._connection.close()
 
+    @fire_and_forget
     def run(self):
         """Run the example code by connecting and then starting the IOLoop."""
         while not self._stopping:
@@ -131,6 +129,17 @@ class Publisher:
         logger.info("Stopped")
 
 
+def read_dots_for_ever(pub):
+    x = None
+    while x != "q":
+
+        logger.info(f"Waiting for a 📨 to send (press q to exit)")
+
+        x = input(f"Write some dots\t\t")
+
+        pub.send_message(x)
+
+
 if __name__ == "__main__":
 
     log_level = logging.DEBUG
@@ -138,3 +147,12 @@ if __name__ == "__main__":
 
     pub = Publisher(QUEUE_NAME, heartbeat=10)
     pub.run()
+
+    time.sleep(2)  # wait for connection to be ready
+
+    try:
+        read_dots_for_ever(pub)
+        pub.stop()
+    except KeyboardInterrupt:
+        pub.stop()
+        print("Received exit, exiting")
