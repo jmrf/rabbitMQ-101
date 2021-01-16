@@ -12,6 +12,11 @@ logger = logging.getLogger(__name__)
 
 
 class Publisher:
+
+    """Publisher class inspired by:
+    https://github.com/pika/pika/blob/master/examples/asynchronous_publisher_example.py
+    """
+
     def __init__(
         self, queue_name: str, ampq_uri: str = "localhost", heartbeat: int = 60,
     ):
