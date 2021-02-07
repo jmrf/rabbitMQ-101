@@ -1,2 +1,2 @@
-QUEUE_NAME = "watcher_queue"
-HEARTBEAT = 60
+QUEUE_NAME = "dots-example-q"
+HEARTBEAT = 5
