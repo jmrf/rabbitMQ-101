@@ -3,10 +3,10 @@ semsearch/models/
 **/models/
 
 # Data
-examples/*/data/
+**/QueueData/
 
 # Indices
-examples/*/indices/
+**/indices/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
