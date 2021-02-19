@@ -1,4 +1,5 @@
 import logging
+import time
 
 import coloredlogs
 import pika
@@ -9,7 +10,7 @@ from .constants import QUEUE_NAME
 logger = logging.getLogger(__name__)
 
 
-class Watcher:
+class Publisher:
     def __init__(self, queue_name: str):
 
         self.queue_name = queue_name
@@ -29,10 +30,24 @@ class Watcher:
         self.channel = self.connection.channel()
         self.channel.queue_declare(queue=self.queue_name, durable=True)
 
+    def get_q_count(self):
+        return self.channel.queue_declare(
+            queue=self.queue_name, passive=True
+        ).method.message_count
+
     def close_queue(self):
         self.connection.close()
 
+    def wait_on_q_limit(self, lim=5):
+        msg_in_q = self.get_q_count()
+        print(f"found {msg_in_q} messages in the queue...")
+        while msg_in_q > lim:
+            print(f"waiting... ({msg_in_q} remaining)")
+            time.sleep(1)
+            msg_in_q = self.get_q_count()
+
     def send_message(self, message):
+        self.wait_on_q_limit(lim=2)
         self.channel.basic_publish(
             exchange="",
             routing_key=self.queue_name,
@@ -58,5 +73,5 @@ if __name__ == "__main__":
     log_level = logging.DEBUG
     coloredlogs.install(logger=logger, level=log_level)
 
-    w = Watcher(QUEUE_NAME)
+    w = Publisher(QUEUE_NAME)
     w.run()

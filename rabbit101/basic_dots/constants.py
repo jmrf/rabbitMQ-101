@@ -1,2 +1,2 @@
 QUEUE_NAME = "dots-example-q"
-HEARTBEAT = 5
+HEARTBEAT = 0
