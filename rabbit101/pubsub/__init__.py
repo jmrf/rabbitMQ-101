@@ -1,6 +1,6 @@
 import pika
 
-QUEUE_NAME='queue_exchange_test'
+QUEUE_NAME = "queue_exchange_test"
 
 
 def init_queue_channel(
