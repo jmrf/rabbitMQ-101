@@ -1,5 +1,5 @@
+import argparse
 import time
-import sys
 
 import logging
 import coloredlogs
@@ -10,6 +10,19 @@ from . import QUEUE_NAME
 logger = logging.getLogger(__name__)
 
 global queue_name
+
+
+def get_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--exchange", "-x", required=True, help="exchange name")
+    parser.add_argument(
+        "--routing_keys",
+        "-R",
+        required=True,
+        help="comma delimited list of routing keys",
+    )
+
+    return parser.parse_args()
 
 
 def callback(ch, method, properties, body):
@@ -29,22 +42,21 @@ def callback(ch, method, properties, body):
 
 if __name__ == "__main__":
 
-    _use_named_q = bool(int(sys.argv[1]))
+    args = get_args()
 
     log_level = logging.DEBUG
     coloredlogs.install(logger=logger, level=log_level)
 
     # Declare the queue and the exchange
-    connection, channel = init_queue_channel("localhost")
+    connection, channel = init_queue_channel("localhost", exchange=args.exchange)
 
-    _queue_name = QUEUE_NAME if _use_named_q else ""
-    _exclusive = False if _use_named_q else True
-    result = channel.queue_declare(queue=_queue_name, exclusive=_exclusive, durable=True)
-
+    # Create a random Queue
+    result = channel.queue_declare(queue="", exclusive=True, durable=True)
     queue_name = result.method.queue
 
-    logger.debug(f"Binding to queue: '{queue_name}'")
-    channel.queue_bind(exchange="logs", queue=queue_name)
+    for k in args.routing_keys.split(","):
+        logger.debug(f"Binding queue {queue_name} to key: '{k}'")
+        channel.queue_bind(exchange=args.exchange, queue=queue_name, routing_key=k)
 
     print(" [*] Waiting for logs. To exit press CTRL+C")
     channel.basic_consume(queue=queue_name, on_message_callback=callback, auto_ack=True)
