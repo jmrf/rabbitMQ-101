@@ -14,6 +14,7 @@ global queue_name
 
 def get_args():
     parser = argparse.ArgumentParser()
+    parser.add_argument("--anon_queue", "-a", action="store_true", help="exchange name")
     parser.add_argument("--exchange", "-x", required=True, help="exchange name")
     parser.add_argument(
         "--routing_keys",
@@ -51,7 +52,14 @@ if __name__ == "__main__":
     connection, channel = init_queue_channel("localhost", exchange=args.exchange)
 
     # Create a random Queue
-    result = channel.queue_declare(queue=QUEUE_NAME, exclusive=False, durable=True)
+    _queue_name = "" if args.anon_queue else QUEUE_NAME
+    result = channel.queue_declare(
+        queue=_queue_name,
+        passive=False,
+        exclusive=False,
+        durable=True,
+        auto_delete=False,
+    )
     queue_name = result.method.queue
 
     for k in args.routing_keys.split(","):

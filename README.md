@@ -52,3 +52,17 @@ python -m rabbit101.aio_pika_with_sanic.tx
 ```bash
 curl -X POST 'localhost:7777/send?dots=..' | jq
 ```
+
+### PubSub (ampq exchanges)
+
+```bash
+# run a consumer with a non-anonymous queue
+python -m rabbit101.pubsub.rx -x rabbit.test -R test.test
+
+# run a consumer with a anonymous queue
+python -m rabbit101.pubsub.rx -a -x rabbit.test -R test.test
+
+# send a message to the exchange (all consumers and monitor the non-anon queue)
+python -m rabbit101.pubsub.tx -x rabbit.test -r test.test
+
+```
