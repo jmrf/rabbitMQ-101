@@ -3,11 +3,24 @@
 This is a repo with a collection of scripts to understand RabbitMQ.
 
 
+<!--ts-->
+   * [rabbitMQ-101](#rabbitmq-101)
+      * [Run](#run)
+         * [Basic Dots example](#basic-dots-example)
+         * [AIO Pika with Sanic](#aio-pika-with-sanic)
+         * [PubSub (ampq exchanges)](#pubsub-ampq-exchanges)
+
+<!-- Added by: jose, at: Mon May 31 19:51:05 UTC 2021 -->
+
+<!--te-->
+
+
 ## Run
 
 You'll need 3 different terminals in the same machine (rabbit listening on localhost):
 
 Run rabbitMQ:
+
 ```
 ./run_rabbit.sh
 ```
