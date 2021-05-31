@@ -51,7 +51,7 @@ if __name__ == "__main__":
     connection, channel = init_queue_channel("localhost", exchange=args.exchange)
 
     # Create a random Queue
-    result = channel.queue_declare(queue="", exclusive=True, durable=True)
+    result = channel.queue_declare(queue=QUEUE_NAME, exclusive=False, durable=True)
     queue_name = result.method.queue
 
     for k in args.routing_keys.split(","):

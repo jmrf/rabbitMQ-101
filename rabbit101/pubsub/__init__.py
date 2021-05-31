@@ -1,6 +1,6 @@
 import pika
 
-QUEUE_NAME = "queue_exchange_test"
+QUEUE_NAME = "exchange_test_queue"
 
 
 def init_queue_channel(
@@ -10,6 +10,8 @@ def init_queue_channel(
     connection = pika.BlockingConnection(pika.ConnectionParameters(host=host))
 
     channel = connection.channel()
-    channel.exchange_declare(exchange=exchange, exchange_type=exchange_type)
+    channel.exchange_declare(
+        exchange=exchange, exchange_type=exchange_type, passive=True, durable=True
+    )
 
     return connection, channel

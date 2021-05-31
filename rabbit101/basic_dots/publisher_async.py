@@ -18,10 +18,7 @@ class Publisher:
     """
 
     def __init__(
-        self,
-        queue_name: str,
-        ampq_uri: str = "localhost",
-        heartbeat: int = 60,
+        self, queue_name: str, ampq_uri: str = "localhost", heartbeat: int = 60,
     ):
         # RabbitMQ parameters
         self._uri = ampq_uri

@@ -7,6 +7,7 @@ import logging
 import coloredlogs
 
 from . import init_queue_channel
+from . import QUEUE_NAME
 
 logger = logging.getLogger(__name__)
 
@@ -31,18 +32,19 @@ if __name__ == "__main__":
     # Declare the queue and the exchange
     connection, channel = init_queue_channel("localhost", exchange=args.exchange)
 
-    # n_msgs = channel.queue_declare(
-    #     queue=QUEUE_NAME, passive=True, durable=True
-    # ).method.message_count
+    queue = channel.queue_declare(
+        queue=QUEUE_NAME, exclusive=False, passive=True, durable=True
+    )
+    n_msgs = queue.method.message_count
 
-    # logger.debug(f"Messages in queue ({QUEUE_NAME}): {n_msgs}")
+    logger.debug(f"Messages in queue ({QUEUE_NAME}): {n_msgs}")
 
     # Compose a message
     message = " ".join(sys.argv[1:]) or "info: Hello World!"
     message += " " + dt.datetime.now().isoformat()
 
     channel.basic_publish(
-        exchange=args.exchange, routing_key=args.routing_keys, body=message
+        exchange=args.exchange, routing_key=args.routing_key, body=message
     )
 
     print(" [x] Sent %r" % message)
