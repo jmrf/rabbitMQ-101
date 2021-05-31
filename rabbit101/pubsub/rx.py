@@ -55,10 +55,10 @@ if __name__ == "__main__":
     _queue_name = "" if args.anon_queue else QUEUE_NAME
     result = channel.queue_declare(
         queue=_queue_name,
-        passive=False,
-        exclusive=False,
-        durable=True,
-        auto_delete=False,
+        passive=False,  # creates if it doesn't exist
+        exclusive=False,  # so we can reconnect after consumer restart
+        durable=True,  # message persistance
+        auto_delete=False,  # queue survives consumer restart
     )
     queue_name = result.method.queue
 

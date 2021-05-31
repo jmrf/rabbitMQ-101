@@ -32,16 +32,14 @@ if __name__ == "__main__":
     # Declare the queue and the exchange
     connection, channel = init_queue_channel("localhost", exchange=args.exchange)
 
-    queue = channel.queue_declare(
-        queue=QUEUE_NAME, exclusive=False, passive=True, durable=True
-    )
-    n_msgs = queue.method.message_count
-
-    logger.debug(f"Messages in queue ({QUEUE_NAME}): {n_msgs}")
+    # queue = channel.queue_declare(
+    #     queue=QUEUE_NAME, exclusive=False, passive=True, durable=True
+    # )
+    # n_msgs = queue.method.message_count
+    # logger.debug(f"Messages in queue ({QUEUE_NAME}): {n_msgs}")
 
     # Compose a message
-    message = " ".join(sys.argv[1:]) or "info: Hello World!"
-    message += " " + dt.datetime.now().isoformat()
+    message = "info: Hello World! " + dt.datetime.now().isoformat()
 
     channel.basic_publish(
         exchange=args.exchange, routing_key=args.routing_key, body=message
